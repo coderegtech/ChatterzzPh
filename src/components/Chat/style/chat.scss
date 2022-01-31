@@ -1,0 +1,223 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap");
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+// defaults
+img {
+  width: 100%;
+  object-fit: cover;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+// global variables
+$bg-dark: #14192c;
+$bg-light: #232b4b;
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #262626;
+}
+
+.ds-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn {
+  background-color: #0a0d1b;
+  outline: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  color: #fefefe;
+  border-radius: 8px;
+  font-weight: 700;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.384);
+}
+
+#root {
+  padding: 0 1rem;
+}
+
+.chat-container {
+  max-width: 780px;
+  width: 100%;
+  min-height: 500px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.5);
+
+  .sideMenu {
+    position: relative;
+    background-color: $bg-dark;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+
+    .web-title {
+      color: #fefefe;
+      font-size: 1.5em;
+      white-space: nowrap;
+    }
+    .user {
+      flex-direction: column;
+      .user-profile {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        background-color: #fff;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid #fff;
+      }
+
+      .userName {
+        color: #fefefe;
+        font-size: 1.3em;
+        font-weight: 500;
+        padding: 0.8rem 0;
+      }
+    }
+  }
+
+  //   Chat section
+  .chat {
+    position: relative;
+    width: 100%;
+
+    .chat-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      min-height: 50px;
+      z-index: 5;
+      background-color: $bg-light;
+      border-bottom: 2px solid $bg-dark;
+    }
+
+    .chat-box {
+      width: 100%;
+      height: 100%;
+      padding: 4rem 2rem;
+      position: absolute;
+      left: 0;
+      overflow-y: scroll;
+      background-color: $bg-light;
+
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: $bg-dark;
+        height: 50px;
+        border-radius: 10px;
+      }
+
+      .msg-content {
+        width: 100%;
+        position: relative;
+        display: flex;
+        gap: 0.8rem;
+        margin: 1.5rem 0;
+
+        &.sent {
+          flex-direction: row-reverse;
+
+          .msg {
+            background-color: #fefefe;
+          }
+        }
+
+        &.received {
+          align-self: flex-start;
+
+          .msg {
+            background-color: #111;
+            color: #fefefe;
+          }
+        }
+
+        .user-profile {
+          width: 25px;
+          height: 25px;
+          border-radius: 50%;
+          align-self: flex-start;
+          //   border: 1px solid #fefefe;
+        }
+
+        .msg {
+          max-width: 300px;
+          // word-wrap: break-word;
+          font-size: 1em;
+          padding: 0.5rem 1rem;
+          border-radius: 20px;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .msg-form {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      min-height: 50px;
+      z-index: 5;
+      padding: 0.5rem 2rem;
+      background-color: $bg-light;
+      border-top: 2px solid $bg-dark;
+      display: flex;
+      gap: 0.2rem;
+
+      .msg-input {
+        width: 100%;
+        border-radius: 8px 0 0 8px;
+        border: none;
+        outline: none;
+        padding: 0 1rem;
+        font-weight: 600;
+        background-color: $bg-dark;
+        color: #fefefe;
+      }
+
+      .submit-msg-btn {
+        border-radius: 0 8px 8px 0;
+        display: grid;
+        place-items: center;
+
+        .btn-icon {
+          font-size: 1.2rem;
+          padding: 0;
+        }
+      }
+    }
+  }
+}

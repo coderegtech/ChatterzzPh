@@ -1,0 +1,60 @@
+.signin-container {
+  max-width: 350px;
+  width: 100%;
+  min-height: 450px;
+  background-color: #232b4b;
+  border-radius: 10px;
+  padding: 7rem 2rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  text-align: center;
+}
+
+.signin-container .web-title {
+  font-size: 1.5rem;
+  color: #fefefe;
+}
+
+.signin-container .login {
+  width: 100%;
+  margin: 0.8rem 0;
+  padding: 0.5rem 0.8rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+}
+
+.signin-container .login .icon {
+  font-size: 1.2rem;
+  margin-left: 0.5em;
+}
+
+@media (max-width: 550px) {
+  .signin-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+    width: 90%;
+    height: 80vh;
+  }
+}
+/*# sourceMappingURL=login.css.map */
