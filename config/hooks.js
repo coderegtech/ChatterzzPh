@@ -66,18 +66,37 @@ export const createUser = async (formdata) => {
     await createAccount(data);
   } catch (e) {
     console.log(e);
+
+    return {
+      error: e,
+    };
+  }
+};
+
+const checkIfEmailExists = async (email) => {
+  try {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error checking email:", error);
+    return false;
   }
 };
 
 const createAccount = async (data) => {
   try {
     const userRef = doc(db, "users", data.uid);
-    const q = query(userRef, where("email", "==", data.email));
-    const userSnap = await getDoc(q);
+    const userSnap = await getDoc(userRef);
+    const userExist = await checkIfEmailExists(data?.email);
 
-    if (userSnap.exists()) {
-      console.log("User already exists:", userSnap.data());
-
+    if (userSnap.exists() || userExist) {
       await toggleUserStatus(data.uid, "online");
 
       return; // Exit early if user already exists
@@ -87,6 +106,10 @@ const createAccount = async (data) => {
     console.log("User created: ", data);
   } catch (e) {
     console.log(e);
+
+    return {
+      error: e,
+    };
   }
 };
 

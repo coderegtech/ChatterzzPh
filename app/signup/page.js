@@ -40,12 +40,22 @@ const SignupScreen = () => {
 
       const res = await createUser(data);
 
-      console.log(res);
+      if (res?.error.code === "auth/email-already-in-use") {
+        toast.error("Email is already exist!");
+      }
     } catch (e) {
       console.log(e);
     } finally {
       setSubmitting(false);
+      clearInputs();
     }
+  };
+
+  const clearInputs = () => {
+    setUsername("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
   };
 
   return (

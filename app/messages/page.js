@@ -360,7 +360,7 @@ export function Avatar({ photoURL, size = 40, isOnline }) {
       <Image
         src={
           photoURL ||
-          "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngmart.com%2Ffiles%2F22%2FUser-Avatar-Profile-PNG-Isolated-File.png&f=1&nofb=1&ipt=5ca47af2f92ccc756d5cb6c0e055f5fa60c8c9fae165f58807448e940afda20d"
+          "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic.vecteezy.com%2Fsystem%2Fresources%2Fpreviews%2F013%2F317%2F294%2Foriginal%2Fincognito-icon-man-woman-face-with-glasses-black-and-white-graphic-spy-agent-line-and-glyph-icon-security-and-detective-hacker-sign-graphics-editable-stroke-linear-icon-free-vector.jpg&f=1&nofb=1&ipt=b94b7dea24b7bc4f9dcbca158723d626ae9bac7220954149c2bb42d805ed81f5"
         }
         alt="Avatar"
         width={size}

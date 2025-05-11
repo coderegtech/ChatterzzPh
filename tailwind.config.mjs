@@ -8,7 +8,7 @@ export default {
   theme: {
     extend: {
       height: {
-        screen: "calc(100dvh - 4rem)",
+        screen: "calc(100dvh - 5rem)",
         minHeight: "100dvh",
       },
       colors: {
