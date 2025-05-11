@@ -327,7 +327,7 @@ export function BottomNavigation(userId) {
       label: "Users",
     },
     {
-      path: "/messages",
+      path: "/",
       icon: <StoriesIcon />,
       label: "Stories",
     },
