@@ -469,13 +469,13 @@ function MenuIcon() {
   );
 }
 
-export function MessagesIcon({ large = false }) {
+export function MessagesIcon({ large = false, extraSize = false }) {
   const size = large ? "h-16 w-16 text-cyan-200" : "h-6 w-6";
-
+  const sizeLg = extraSize ? "h-24 w-24 text-cyan-200" : size;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className={size}
+      className={large ? size : extraSize ? sizeLg : size}
       viewBox="0 0 20 20"
       fill="currentColor"
     >

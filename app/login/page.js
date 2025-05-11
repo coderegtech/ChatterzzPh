@@ -28,6 +28,10 @@ const LoginScreen = () => {
       if (res?.error.code === "auth/invalid-credential") {
         toast.error("Invalid credentials.");
       }
+
+      if (res?.error.code === "auth/email-already-in-use") {
+        toast.error("Email is already exist!");
+      }
     } catch (error) {
       console.log(error);
     } finally {
