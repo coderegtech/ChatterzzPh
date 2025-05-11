@@ -14,10 +14,12 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
+  query,
   serverTimestamp,
   setDoc,
   Timestamp,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { ref, uploadBytes } from "firebase/storage";
 import moment from "moment";
@@ -70,7 +72,8 @@ export const createUser = async (formdata) => {
 const createAccount = async (data) => {
   try {
     const userRef = doc(db, "users", data.uid);
-    const userSnap = await getDoc(userRef);
+    const q = query(userRef, where("email", "==", data.email));
+    const userSnap = await getDoc(q);
 
     if (userSnap.exists()) {
       console.log("User already exists:", userSnap.data());

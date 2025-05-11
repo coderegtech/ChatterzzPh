@@ -103,10 +103,9 @@ const Messages = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black">
+    <div className=" h-screen bg-gradient-to-b from-indigo-900 to-black">
       <Header router={router} />
       <UserInfoBar user={user} auth={auth} signOut={handleLogout} />
-      <GlobalChatIndex />
 
       <MessagesList
         messages={messages}
@@ -160,27 +159,29 @@ function UserInfoBar({ user, auth, signOut }) {
 
 // Message list component that handles empty state and message rendering
 function MessagesList({ messages, senderId, seen, router }) {
-  if (messages.length === 0) {
-    return <EmptyState />;
-  }
-
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="divide-y divide-indigo-900/30">
-        {messages.map((message) => (
-          <MessageItem
-            key={message.id}
-            message={message}
-            senderId={senderId}
-            seen={seen}
-            onClick={() => {
-              const otherParticipant = message.participants.find(
-                (index) => index !== senderId
-              );
-              router.push(`/convo/${senderId}/${otherParticipant}`);
-            }}
-          />
-        ))}
+        <GlobalChatIndex />
+
+        {messages.length === 0 ? (
+          <EmptyState />
+        ) : (
+          messages.map((message) => (
+            <MessageItem
+              key={message.id}
+              message={message}
+              senderId={senderId}
+              seen={seen}
+              onClick={() => {
+                const otherParticipant = message.participants.find(
+                  (index) => index !== senderId
+                );
+                router.push(`/convo/${senderId}/${otherParticipant}`);
+              }}
+            />
+          ))
+        )}
       </div>
     </div>
   );
@@ -334,7 +335,7 @@ export function BottomNavigation(userId) {
   ];
 
   return (
-    <div className="bg-black bg-opacity-50 backdrop-blur-lg border-t border-indigo-900/30 flex justify-around py-3">
+    <div className="fixed bottom-0 left-0 w-full bg-black bg-opacity-50 backdrop-blur-lg border-t border-indigo-900/30 flex justify-around py-3">
       {items.map((item, index) => (
         <NavItem
           key={index}

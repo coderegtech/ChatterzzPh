@@ -7,6 +7,9 @@ export default {
   ],
   theme: {
     extend: {
+      height: {
+        screen: "calc(100dvh - 4.8rem)",
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

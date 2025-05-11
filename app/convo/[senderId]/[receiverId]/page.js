@@ -304,7 +304,7 @@ const Conversation = () => {
       </div>
 
       {/* Message Input */}
-      <div className="p-4 bg-black bg-opacity-30 backdrop-blur-lg border-t border-indigo-900/30">
+      <div className="fixed bottom-0 left-0 w-full p-4 bg-black bg-opacity-30 backdrop-blur-lg border-t border-indigo-900/30">
         <form
           onSubmit={handleSend}
           className="flex items-center bg-black bg-opacity-40 backdrop-blur-sm rounded-full px-4 py-2 border border-indigo-900/30"
