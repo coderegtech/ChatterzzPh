@@ -35,7 +35,7 @@ svg.loading {
   animation: rotate4 2s linear infinite;
 }
 
-circle {
+svg.loading circle {
   fill: none;
   stroke: hsl(214, 97%, 59%);
   stroke-width: 2;

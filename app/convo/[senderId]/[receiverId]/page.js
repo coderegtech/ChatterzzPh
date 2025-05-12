@@ -1,7 +1,8 @@
 "use client";
 import { Avatar } from "@/app/messages/page";
+import { useToast } from "@/components/Toastify";
 import { db } from "@/config/firebase";
-import { fetchUserById } from "@/config/hooks";
+import { DeleteChat, fetchUserById } from "@/config/hooks";
 import {
   addDoc,
   collection,
@@ -28,6 +29,7 @@ const Conversation = () => {
   const conversationId = [senderId, receiverId].sort().join("_");
   const [msgId, setMsgId] = useState(null);
   const [receiverInfo, setReceiverInfo] = useState(null);
+  const [activeSideMenu, setActiveSideMenu] = useState(false);
 
   const router = useRouter();
 
@@ -195,7 +197,7 @@ const Conversation = () => {
   }, [receiverId]);
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black">
+    <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black ">
       {/* Header */}
       <div className="bg-black bg-opacity-40 backdrop-blur-lg p-4 flex items-center border-b border-indigo-900/30">
         <div className="flex items-center space-x-3">
@@ -239,12 +241,12 @@ const Conversation = () => {
             )}
           </div>
 
-          {/* <div
-            onClick={() => DeleteChat(conversationId)}
-            className="absolute right-5 top-1/2 -translate-y-1/2"
+          <div
+            onClick={() => setActiveSideMenu(true)}
+            className="absolute right-5 top-1/2 -translate-y-1/2 cursor-pointer hover:bg-white/20 hover:rounded-full p-1"
           >
-            <DeleteConvoIcon />
-          </div> */}
+            <MenuDotsIcon size="20" />
+          </div>
         </div>
       </div>
 
@@ -304,7 +306,7 @@ const Conversation = () => {
       </div>
 
       {/* Message Input */}
-      <div className="fixed bottom-0 left-0 w-full p-4 bg-black bg-opacity-30 backdrop-blur-lg border-t border-indigo-900/30">
+      <div className="fixed bottom-0 left-0 w-full p-4 bg-black bg-opacity-30 backdrop-blur-lg border-t border-indigo-900/30 z-50">
         <form
           onSubmit={handleSend}
           className="flex items-center bg-black bg-opacity-40 backdrop-blur-sm rounded-full px-4 py-2 border border-indigo-900/30"
@@ -337,28 +339,92 @@ const Conversation = () => {
           </button>
         </form>
       </div>
+
+      {activeSideMenu && (
+        <SideMenu
+          open={activeSideMenu}
+          close={() => setActiveSideMenu(false)}
+          photoURL={receiverInfo?.photoURL}
+          isOnline={receiverInfo?.status}
+          name={receiverInfo?.displayName}
+          convoId={conversationId}
+        />
+      )}
     </div>
   );
 };
 
-const DeleteConvoIcon = () => {
+const SideMenu = ({ open, close, photoURL, isOnline, name, convoId }) => {
+  const toast = useToast();
+  const router = useRouter();
+
+  const handleDeleteConvo = async () => {
+    await DeleteChat(convoId);
+    toast("success", "Message successfully removed!");
+    router.push("/messages");
+  };
+
+  return (
+    <div
+      className={`absolute max-w-80 w-full h-full top-0 z-[100] p-6 
+      bg-gradient-to-b from-indigo-900 to-black 
+      transition-all duration-300 ease-in-out 
+      ${open ? "right-0" : "-right-full"}`}
+    >
+      <header className="w-full flex justify-end">
+        <div onClick={close}>
+          <CloseIcon size={"30"} />
+        </div>
+      </header>
+
+      <div className="py-4 flex flex-col justify-center gap-y-2 items-center">
+        <Avatar photoURL={photoURL} size={"80"} isOnline={isOnline} />
+        <p className="text-lg">{name}</p>
+      </div>
+
+      <div className="py-4">
+        <ul>
+          <li
+            onClick={handleDeleteConvo}
+            className="border-b border-white/5 p-2 hover:bg-white/5 cursor-pointer"
+          >
+            Delete conversation
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+const CloseIcon = ({ size }) => {
   return (
     <svg
-      width="30px"
-      height="30px"
-      viewBox="0 0 24 24"
-      fill="#fff"
       xmlns="http://www.w3.org/2000/svg"
+      id="Outline"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="white"
     >
-      <path
-        d="M8 6H19C19.5523 6 20 6.44772 20 7V17C20 17.5523 19.5523 18 19 18H8L2 12L5 9M16 9L13.0001 11.9999M13.0001 11.9999L10 15M13.0001 11.9999L10.0002 9M13.0001 11.9999L16.0002 15"
-        stroke="#000000"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M18,6h0a1,1,0,0,0-1.414,0L12,10.586,7.414,6A1,1,0,0,0,6,6H6A1,1,0,0,0,6,7.414L10.586,12,6,16.586A1,1,0,0,0,6,18H6a1,1,0,0,0,1.414,0L12,13.414,16.586,18A1,1,0,0,0,18,18h0a1,1,0,0,0,0-1.414L13.414,12,18,7.414A1,1,0,0,0,18,6Z" />
     </svg>
   );
 };
 
+const MenuDotsIcon = ({ size }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      id="Outline"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="white"
+    >
+      <circle cx="2" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="22" cy="12" r="2" />
+    </svg>
+  );
+};
 export default Conversation;
