@@ -111,7 +111,7 @@ const Messages = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black">
+    <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black relative">
       <Header router={router} />
       <UserInfoBar user={user} auth={auth} signOut={handleLogout} />
       <GlobalChatIndex />
@@ -342,7 +342,7 @@ export function BottomNavigation(userId) {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-black bg-opacity-50 backdrop-blur-lg border-t border-indigo-900/30 flex justify-around py-3">
+    <div className="fixed bottom-0 left-0 w-full bg-black backdrop-blur-lg border-t border-indigo-900/30 flex justify-around py-5">
       {items.map((item, index) => (
         <NavItem
           key={index}
