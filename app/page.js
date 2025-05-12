@@ -12,6 +12,8 @@ const MainPage = () => {
   useEffect(() => {
     if (user?.uid || user?.accessToken) {
       router.push("/messages");
+    } else {
+      router.push("/login");
     }
   }, [router, user?.accessToken, user?.uid]);
 

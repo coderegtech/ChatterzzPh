@@ -17,7 +17,7 @@ const UsersScreen = () => {
         const res = await fetchAllUsers();
 
         const exceptMe = res.filter(
-          (item) => item.uid !== auth?.currentUser?.uid
+          (item) => item.uid !== auth?.currentUser?.uid || item.email !== ""
         );
         setUsers(exceptMe);
       } catch (e) {

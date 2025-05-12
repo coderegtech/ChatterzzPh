@@ -1,4 +1,5 @@
 "use client";
+import { useToast } from "@/components/Toastify";
 import { auth, db } from "@/config/firebase";
 import { fetchUserById, logoutUser } from "@/config/hooks";
 import { useAuth } from "@/context/userContext";
@@ -23,7 +24,7 @@ const Messages = () => {
   const [receiverId, setReceiverId] = useState(null);
   const router = useRouter();
   const { user, setUser } = useAuth();
-
+  const toast = useToast();
   const senderId = user?.uid || "something";
 
   useEffect(() => {
@@ -103,6 +104,8 @@ const Messages = () => {
       setUser(null);
       localStorage.removeItem("user");
       router.push("/login");
+
+      toast("success", "User logged out!");
     } catch (error) {
       console.error("Logout failed", error);
     } finally {

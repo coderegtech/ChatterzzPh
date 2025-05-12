@@ -1,9 +1,9 @@
 "use client";
 
+import { useToast } from "@/components/Toastify";
 import { createUser } from "@/config/hooks";
 import { useState } from "react";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
-import { toast } from "react-toastify";
 const SignupScreen = () => {
   const [profile, setProfile] = useState(null);
   const [username, setUsername] = useState("");
@@ -14,6 +14,7 @@ const SignupScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const toast = useToast();
   // const handleProfileChange = (event) => {
   //   const file = event.target.files[0];
   //   if (file) {
@@ -28,7 +29,7 @@ const SignupScreen = () => {
       if (!username || !email || !password) return;
 
       if (password !== confirmPassword) {
-        toast.error("Passwords do not match");
+        toast("error", "Password do not match!");
         return;
       }
 
@@ -41,7 +42,7 @@ const SignupScreen = () => {
       const res = await createUser(data);
 
       if (res?.error.code === "auth/email-already-in-use") {
-        toast.error("Email is already exist!");
+        toast("error", "Email already exist!");
       }
     } catch (e) {
       console.log(e);
@@ -59,7 +60,7 @@ const SignupScreen = () => {
   };
 
   return (
-    <div className="bg-white h-full flex items-center justify-center">
+    <div className="bg-white min-h-screen flex items-center justify-start">
       <div className="bg-white w-full p-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
