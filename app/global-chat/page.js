@@ -84,8 +84,8 @@ const GroupChats = () => {
               xmlns="http://www.w3.org/2000/svg"
               id="Outline"
               viewBox="0 0 24 24"
-              width="30"
-              height="30"
+              width="35"
+              height="35"
               fill="url(#blue-cyan-gradient)"
             >
               <defs>

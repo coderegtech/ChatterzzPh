@@ -204,8 +204,8 @@ const Conversation = () => {
               xmlns="http://www.w3.org/2000/svg"
               id="Outline"
               viewBox="0 0 24 24"
-              width="30"
-              height="30"
+              width="35"
+              height="35"
               fill="url(#blue-cyan-gradient)"
             >
               <defs>
@@ -274,7 +274,7 @@ const Conversation = () => {
                 </div>
 
                 <div
-                  className={`flex justify-end items-center mt-1 space-x-1 text-xs ${
+                  className={`flex justify-start items-center mt-1 space-x-1 text-xs ${
                     isMe
                       ? "text-right text-cyan-200"
                       : "text-left text-gray-400"

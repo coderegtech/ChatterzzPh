@@ -59,7 +59,7 @@ const SignupScreen = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen flex items-center justify-center">
+    <div className="bg-white h-full flex items-center justify-center">
       <div className="bg-white w-full p-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

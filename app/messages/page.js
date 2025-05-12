@@ -14,6 +14,7 @@ import moment from "moment";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Loading from "../loading";
 
 const Messages = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,30 +29,37 @@ const Messages = () => {
   useEffect(() => {
     setIsLoading(true);
 
-    const chatRef = collection(db, `chats`);
-    const q = query(
-      chatRef,
-      where("participants", "array-contains", senderId),
-      where("status", "!=", "inactive"),
-      orderBy("timestamp", "desc")
-    );
+    const loadChats = async () => {
+      try {
+        const chatRef = collection(db, `chats`);
+        const q = query(
+          chatRef,
+          where("participants", "array-contains", senderId),
+          where("status", "!=", "inactive"),
+          orderBy("timestamp", "desc")
+        );
 
-    const unsubscribe = onSnapshot(q, async (snapshot) => {
-      const inboxMessages = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
+        await onSnapshot(q, async (snapshot) => {
+          const inboxMessages = snapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
 
-      const receiver = inboxMessages.map((item) =>
-        item.participants.find((index) => index !== senderId)
-      );
-      console.log("receiver: ", ...receiver);
-      setReceiverId(...receiver);
-      setMessages(inboxMessages);
-      setIsLoading(false);
-    });
+          const receiver = inboxMessages.map((item) =>
+            item.participants.find((index) => index !== senderId)
+          );
+          console.log("receiver: ", ...receiver);
+          setReceiverId(...receiver);
+          setMessages(inboxMessages);
+        });
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => unsubscribe();
+    return () => loadChats();
   }, [senderId, user?.uid]);
 
   useEffect(() => {
@@ -84,9 +92,9 @@ const Messages = () => {
     return () => unsubscribe();
   }, [senderId, setUser]);
 
-  // if (isLoading) {
-  //   return <Loading />;
-  // }
+  if (isLoading) {
+    return <Loading />;
+  }
 
   const handleLogout = async () => {
     setIsLoading(true);
@@ -124,8 +132,8 @@ function Header({ router }) {
   return (
     <div className="bg-black bg-opacity-40 backdrop-blur-lg p-4 flex items-center justify-between">
       <div className="flex items-center">
-        <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-          Chats
+        <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+          Messenger
         </h1>
       </div>
       <div
@@ -144,7 +152,7 @@ function UserInfoBar({ user, auth, signOut }) {
     <div className="bg-black bg-opacity-30 backdrop-blur-sm p-3 flex items-center justify-between border-b border-indigo-900">
       <div className="flex items-center space-x-2">
         <Avatar photoURL={user?.photoURL} />
-        <h2 className="text-sm text-white font-medium max-w-xs">
+        <h2 className="text-lg text-white font-medium max-w-xs">
           {user?.displayName}
         </h2>
       </div>
@@ -232,7 +240,7 @@ function MessageItem({ message, senderId, seen, onClick }) {
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-baseline">
           <h3
-            className={`text-sm font-medium ${
+            className={`text-base font-medium ${
               isUnread ? "text-cyan-400" : "text-gray-200"
             }`}
           >
@@ -278,7 +286,7 @@ const GlobalChatIndex = () => {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-baseline">
-          <h3 className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+          <h3 className="text-base font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
             Global Chat
           </h3>
         </div>

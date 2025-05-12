@@ -36,7 +36,7 @@ const UsersScreen = () => {
     <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black text-white">
       {/* Header */}
       <div className="bg-black bg-opacity-40 backdrop-blur-lg p-4 border-b border-indigo-900/30">
-        <h1 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+        <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
           Users
         </h1>
       </div>
