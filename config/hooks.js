@@ -326,8 +326,6 @@ export const DeleteChat = async (convoId, status = "inactive") => {
   try {
     const userRef = doc(db, "chats", convoId);
     await updateDoc(userRef, { status: status });
-
-    console.log("hello");
   } catch (e) {
     console.log(e);
   }

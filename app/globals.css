@@ -29,13 +29,13 @@ body {
 }
 
 /* From Uiverse.io by barisdogansutcu */
-svg.loading {
-  width: 2rem;
+svg#loading {
+  width: 3rem;
   transform-origin: center;
   animation: rotate4 2s linear infinite;
 }
 
-svg.loading circle {
+svg#loading circle {
   fill: none;
   stroke: hsl(214, 97%, 59%);
   stroke-width: 2;
