@@ -28,39 +28,42 @@ const Messages = () => {
   const senderId = user?.uid || "something";
 
   useEffect(() => {
+    if (!senderId) return;
+
     setIsLoading(true);
 
-    const loadChats = async () => {
-      try {
-        const chatRef = collection(db, `chats`);
-        const q = query(
-          chatRef,
-          where("participants", "array-contains", senderId),
-          where("status", "!=", "inactive"),
-          orderBy("timestamp", "desc")
+    const chatRef = collection(db, "chats");
+    const q = query(
+      chatRef,
+      where("participants", "array-contains", senderId),
+      where("status", "!=", "inactive"),
+      orderBy("timestamp", "desc")
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const inboxMessages = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+
+        const receivers = inboxMessages.map((item) =>
+          item.participants.find((id) => id !== senderId)
         );
 
-        await onSnapshot(q, async (snapshot) => {
-          const inboxMessages = snapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-          }));
-
-          const receiver = inboxMessages.map((item) =>
-            item.participants.find((index) => index !== senderId)
-          );
-          console.log("receiver: ", ...receiver);
-          setReceiverId(...receiver);
-          setMessages(inboxMessages);
-        });
-      } catch (e) {
-        console.log(e);
-      } finally {
+        console.log("Receivers: ", receivers);
+        setReceiverId(receivers); // or setReceiverId(receivers[0]) if only one expected
+        setMessages(inboxMessages);
+        setIsLoading(false);
+      },
+      (error) => {
+        console.log("Error fetching chats:", error);
         setIsLoading(false);
       }
-    };
+    );
 
-    return () => loadChats();
+    return () => unsubscribe();
   }, [senderId, user?.uid]);
 
   useEffect(() => {
@@ -438,7 +441,7 @@ function SeenIndicator() {
 }
 
 // Action button component
-function ActionButton({ icon, onClick }) {
+export function ActionButton({ icon, onClick }) {
   return (
     <div
       onClick={onClick}
@@ -450,7 +453,7 @@ function ActionButton({ icon, onClick }) {
 }
 
 // Icon components
-function SearchIcon() {
+export function SearchIcon() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

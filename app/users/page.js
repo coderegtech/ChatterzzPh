@@ -4,7 +4,12 @@ import { auth } from "@/config/firebase";
 import { fetchAllUsers } from "@/config/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Avatar, BottomNavigation, MessagesIcon } from "../messages/page";
+import {
+  Avatar,
+  BottomNavigation,
+  MessagesIcon,
+  SearchIcon,
+} from "../messages/page";
 
 const UsersScreen = () => {
   const [search, setSearch] = useState("");
@@ -14,12 +19,12 @@ const UsersScreen = () => {
   useEffect(() => {
     const loadUsers = async () => {
       try {
-        const res = await fetchAllUsers();
-
-        const exceptMe = res.filter(
-          (item) => item.uid !== auth?.currentUser?.uid || item.email !== ""
-        );
-        setUsers(exceptMe);
+        await fetchAllUsers((data) => {
+          const exceptMe = data.filter(
+            (item) => item.uid !== auth?.currentUser?.uid
+          );
+          setUsers(exceptMe);
+        });
       } catch (e) {
         console.log(e);
       }
@@ -42,22 +47,23 @@ const UsersScreen = () => {
       </div>
 
       {/* Search Input */}
-      <div className="p-4">
+      <div className=" flex items-center gap-x-2 m-4 px-4 py-2 rounded-lg bg-black bg-opacity-30 text-white placeholder-gray-400 border border-indigo-900/30 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        <SearchIcon />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search users..."
-          className="w-full px-4 py-2 rounded-lg bg-black bg-opacity-30 text-white placeholder-gray-400 border border-indigo-900/30 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="flex-1 bg-transparent focus:outline-none focus:border-none"
         />
       </div>
 
       {/* User List */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-2">
         {filteredUsers.map((user) => (
           <div
             key={user.id}
-            className="flex items-center space-x-4 bg-black bg-opacity-40 backdrop-blur-md rounded-xl p-4 border border-indigo-900/30 hover:bg-opacity-60 transition  justify-between"
+            className="flex items-center space-x-4 bg-black bg-opacity-40 backdrop-blur-md rounded-xl p-2 px-4 border border-indigo-900/30 hover:bg-opacity-60 transition  justify-between"
           >
             <div className="flex justify-start items-center gap-x-3">
               <Avatar

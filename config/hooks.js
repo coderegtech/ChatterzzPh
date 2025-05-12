@@ -193,16 +193,21 @@ export const fetchUserByUsername = async (username) => {
   }
 };
 
-export const fetchAllUsers = async () => {
+export const fetchAllUsers = async (callback) => {
   try {
-    const querySnapshot = await getDocs(collection(db, "users"));
-    const users = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("email", "!=", "")); // Exclude users with empty email
 
-    console.log("Fetched users:", users);
-    return users;
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const users = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      callback(users);
+    });
+
+    return unsubscribe;
   } catch (error) {
     console.error("Error fetching users:", error);
     return [];
