@@ -94,9 +94,8 @@ const createAccount = async (data) => {
   try {
     const userRef = doc(db, "users", data.uid);
     const userSnap = await getDoc(userRef);
-    const userExist = await checkIfEmailExists(data?.email);
 
-    if (userSnap.exists() || userExist) {
+    if (userSnap.exists()) {
       await toggleUserStatus(data.uid, "online");
 
       return; // Exit early if user already exists
@@ -220,15 +219,18 @@ export const GoogleAuth = async () => {
     const userRes = await signInWithPopup(auth, provider);
     const user = userRes.user;
     const uid = user.uid;
+    const userExist = await checkIfEmailExists(data?.email);
 
-    await createAccount({
-      uid,
-      displayName: user.displayName,
-      email: user.email,
-      status: "online",
-      photoURL: user.photoURL,
-      createdAt: Timestamp.now(),
-    });
+    if (!userExist) {
+      await createAccount({
+        uid,
+        displayName: user.displayName,
+        email: user.email,
+        status: "online",
+        photoURL: user.photoURL,
+        createdAt: Timestamp.now(),
+      });
+    }
 
     // change the status of the user to online
     await toggleUserStatus(uid, "online");
@@ -248,15 +250,18 @@ export const GitHubAuth = async () => {
     const userRes = await signInWithPopup(auth, provider);
     const user = userRes.user;
     const uid = user.uid;
+    const userExist = await checkIfEmailExists(data?.email);
 
-    await createAccount({
-      uid,
-      displayName: user.displayName,
-      email: user.email,
-      status: "online",
-      photoURL: user.photoURL,
-      createdAt: Timestamp.now(),
-    });
+    if (!userExist) {
+      await createAccount({
+        uid,
+        displayName: user.displayName,
+        email: user.email,
+        status: "online",
+        photoURL: user.photoURL,
+        createdAt: Timestamp.now(),
+      });
+    }
 
     // change the status of the user to online
     await toggleUserStatus(uid, "online");
