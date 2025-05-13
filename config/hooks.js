@@ -219,7 +219,7 @@ export const GoogleAuth = async () => {
     const userRes = await signInWithPopup(auth, provider);
     const user = userRes.user;
     const uid = user.uid;
-    const userExist = await checkIfEmailExists(data?.email);
+    const userExist = await checkIfEmailExists(user?.email);
 
     if (!userExist) {
       await createAccount({
@@ -250,7 +250,7 @@ export const GitHubAuth = async () => {
     const userRes = await signInWithPopup(auth, provider);
     const user = userRes.user;
     const uid = user.uid;
-    const userExist = await checkIfEmailExists(data?.email);
+    const userExist = await checkIfEmailExists(user?.email);
 
     if (!userExist) {
       await createAccount({
