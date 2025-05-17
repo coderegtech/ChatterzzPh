@@ -10,6 +10,7 @@ import {
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -281,6 +282,7 @@ export const logoutUser = async () => {
     const uid = auth.currentUser?.uid;
     await toggleUserStatus(uid, "offline");
     await signOut(auth);
+    localStorage.removeItem("user");
 
     console.log("User logged out");
   } catch (e) {
@@ -329,8 +331,19 @@ export const createGlobalChat = async (uid, senderName, photoUrl, msg) => {
 
 export const DeleteChat = async (convoId, status = "inactive") => {
   try {
-    const userRef = doc(db, "chats", convoId);
-    await updateDoc(userRef, { status: status });
+    const messagesRef = collection(db, `chats/${convoId}/messages`);
+    const snapshot = await getDocs(messagesRef);
+
+    const deletePromises = snapshot.docs.map((docSnap) =>
+      deleteDoc(docSnap.ref)
+    );
+
+    await Promise.all(deletePromises);
+
+    // update the convo to inactive
+    await updateDoc(doc(db, "chats", convoId), { status });
+
+    console.log(`Chat ${convoId} messages deleted.`);
   } catch (e) {
     console.log(e);
   }

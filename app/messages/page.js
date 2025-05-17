@@ -104,8 +104,6 @@ const Messages = () => {
     setIsLoading(true);
     try {
       await logoutUser();
-      setUser(null);
-      localStorage.removeItem("user");
       router.push("/login");
 
       toast("success", "User logged out!");
@@ -343,7 +341,7 @@ export function BottomNavigation(userId) {
     {
       path: "/",
       icon: <StoriesIcon />,
-      label: "Stories",
+      label: "Posts",
     },
   ];
 
