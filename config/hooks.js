@@ -1,5 +1,6 @@
 import {
   createUserWithEmailAndPassword,
+  FacebookAuthProvider,
   GithubAuthProvider,
   GoogleAuthProvider,
   signInAnonymously,
@@ -217,6 +218,42 @@ export const fetchAllUsers = async (callback) => {
 export const GoogleAuth = async () => {
   try {
     const provider = new GoogleAuthProvider();
+    const userRes = await signInWithPopup(auth, provider);
+    const user = userRes.user;
+    const uid = user.uid;
+    const userExist = await checkIfEmailExists(user?.email);
+
+    if (!userExist) {
+      await createAccount({
+        uid,
+        displayName: user.displayName,
+        email: user.email,
+        status: "online",
+        photoURL: user.photoURL,
+        createdAt: Timestamp.now(),
+      });
+    }
+
+    // change the status of the user to online
+    await toggleUserStatus(uid, "online");
+    console.log("User logged in: ", user);
+
+    return {
+      data: user,
+    };
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const FacebookAuth = async () => {
+  try {
+    const provider = new FacebookAuthProvider();
+
+    // Scopes
+    provider.addScope("email");
+    provider.addScope("public_profile"); // default
+
     const userRes = await signInWithPopup(auth, provider);
     const user = userRes.user;
     const uid = user.uid;
