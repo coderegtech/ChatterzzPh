@@ -4,12 +4,12 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCRJBPKB8NY8KSzuczR1ZeRNgUzEssczF4",
-  authDomain: "chatterzz-app.firebaseapp.com",
-  projectId: "chatterzz-app",
-  storageBucket: "chatterzz-app.firebasestorage.app",
-  messagingSenderId: "420248101665",
-  appId: "1:420248101665:web:73b9621240cb95fbdc9460",
+  apiKey: process.env.API_KEY,
+  authDomain: process.env.AUTH_DOMAIN,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.STORAGE_BUCKET,
+  messagingSenderId: process.env.MESSAGING_SENDER_ID,
+  appId: process.env.APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);

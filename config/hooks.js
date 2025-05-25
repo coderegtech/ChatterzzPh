@@ -348,3 +348,19 @@ export const DeleteChat = async (convoId, status = "inactive") => {
     console.log(e);
   }
 };
+
+export const AddPost = (uid, postData) => {
+  try {
+    const postsRef = collection(db, `posts/${uid}/userPosts`);
+    const data = {
+      ...postData,
+      uid,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    };
+
+    return addDoc(postsRef, data);
+  } catch (e) {
+    console.log(e);
+  }
+};
