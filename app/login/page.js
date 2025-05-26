@@ -45,14 +45,20 @@ const LoginScreen = () => {
 
   const handleAuthLogin = async (type) => {
     try {
+      let res = null;
+
       if (type === "google") {
-        await GoogleAuth();
+        res = await GoogleAuth();
       } else if (type === "facebook") {
-        await FacebookAuth();
+        res = await FacebookAuth();
       } else if (type === "github") {
-        await GitHubAuth();
+        res = await GitHubAuth();
       } else if (type === "anonymous") {
-        await AnonymousSignin();
+        res = await AnonymousSignin();
+      }
+
+      if (res?.error.code === "auth/account-exists-with-different-credential") {
+        toast("error", "Account exists with different credentials");
       }
     } catch (e) {
       console.log(e);

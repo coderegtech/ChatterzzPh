@@ -29,12 +29,17 @@ export const ToastProvider = ({ children }) => {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="flex items-center gap-4 bg-white p-2 rounded-xl shadow-xl"
+              className={[
+                toast.status === "success"
+                  ? " bg-green-500"
+                  : toast.status === "error"
+                  ? "bg-red-500"
+                  : "bg-gray-100",
+                "flex items-center gap-4  p-4 rounded-md shadow-xl",
+              ].join(" ")}
             >
-              <ToastIcon status={toast.status} />
-              <p className="text-base font-medium flex-1 text-black">
-                {toast.msg}
-              </p>
+              {/* <ToastIcon status={toast.status} /> */}
+              <p className="text-base font-medium text-center">{toast.msg}</p>
             </motion.div>
           ))}
         </AnimatePresence>

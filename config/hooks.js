@@ -243,6 +243,9 @@ export const GoogleAuth = async () => {
     };
   } catch (e) {
     console.log(e);
+    return {
+      error: e,
+    };
   }
 };
 
@@ -279,6 +282,9 @@ export const FacebookAuth = async () => {
     };
   } catch (e) {
     console.log(e);
+    return {
+      error: e,
+    };
   }
 };
 
