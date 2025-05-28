@@ -18,12 +18,6 @@ const AuthProvider = ({ children }) => {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (pathname === "/") {
-      router.push(`/messages`);
-    }
-  }, [pathname]);
-
-  useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
     }

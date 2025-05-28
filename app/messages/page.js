@@ -104,6 +104,7 @@ const Messages = () => {
     setIsLoading(true);
     try {
       await logoutUser();
+      setUser(null);
       router.push("/login");
 
       toast("success", "User logged out!");
