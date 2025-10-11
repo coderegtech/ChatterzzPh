@@ -8,16 +8,54 @@
   "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
   "scope": "/",
+  "lang": "en-US",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "/icon-192.jpg",
-      "sizes": "192x192",
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.jpg",
-      "sizes": "512x512",
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
       "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/window.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/window.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-home.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "description": "ChatterzzPh mobile homepage"
+    },
+    {
+      "src": "/screenshots/desktop-chat.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "description": "ChatterzzPh desktop chat interface"
+    }
+  ],
+  "categories": ["communication", "social", "messaging"],
+  "prefer_related_applications": false
 }
