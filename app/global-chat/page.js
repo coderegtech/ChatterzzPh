@@ -42,26 +42,25 @@ const GroupChats = () => {
     }
   };
 
-  const sendGlobalNotification = async (
-    senderName,
-    messageContent,
-    messageType
-  ) => {
-    try {
-      await fetch("/api/send-notification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          senderName,
-          messageContent,
-          messageType,
-          notificationType: "global",
-        }),
+  const showNotification = (senderName, messageContent, messageType) => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      const body =
+        messageType === "image" ? "📷 Sent an image" : messageContent;
+
+      const notification = new Notification(`${senderName} in Global Chat`, {
+        body: body,
+        icon: "/placeholder-logo.png",
+        badge: "/placeholder-logo.png",
+        tag: "global-chat-notification",
+        requireInteraction: false,
       });
-    } catch (error) {
-      console.error("Failed to send notification:", error);
+
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+
+      setTimeout(() => notification.close(), 5000);
     }
   };
 
@@ -81,7 +80,7 @@ const GroupChats = () => {
       ) {
         const newMsg = chats[chats.length - 1];
         if (newMsg.senderId !== senderId) {
-          await sendGlobalNotification(
+          showNotification(
             newMsg.senderName || "Someone",
             newMsg.message,
             newMsg.msgType

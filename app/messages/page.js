@@ -1,5 +1,5 @@
 "use client";
-import OneSignalInit from "@/components/OneSignalInit";
+import NotificationManager from "@/components/NotificationManager";
 import { useToast } from "@/components/Toastify";
 import { auth, db } from "@/config/firebase";
 import { fetchUserById, logoutUser } from "@/config/hooks";
@@ -119,7 +119,7 @@ const Messages = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black relative">
-      <OneSignalInit userId={user?.uid} />
+      <NotificationManager />
 
       <Header router={router} />
       <UserInfoBar user={user} auth={auth} signOut={handleLogout} />

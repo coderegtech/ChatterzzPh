@@ -63,23 +63,26 @@ const Conversation = () => {
     }
   };
 
-  const sendNotification = async (senderName, messageContent, messageType) => {
-    try {
-      await fetch("/api/send-notification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          receiverId,
-          senderName,
-          messageContent,
-          messageType,
-          notificationType: "direct",
-        }),
+  const showNotification = (senderName, messageContent, messageType) => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      const body =
+        messageType === "image" ? "📷 Sent an image" : messageContent;
+
+      const notification = new Notification(`New message from ${senderName}`, {
+        body: body,
+        icon: "/placeholder-logo.png",
+        badge: "/placeholder-logo.png",
+        tag: "message-notification",
+        requireInteraction: false,
       });
-    } catch (error) {
-      console.error("Failed to send notification:", error);
+
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+
+      // Auto close after 5 seconds
+      setTimeout(() => notification.close(), 5000);
     }
   };
 
@@ -105,7 +108,7 @@ const Conversation = () => {
       ) {
         const newMsg = msgs[msgs.length - 1];
         if (newMsg.senderId === receiverId) {
-          await sendNotification(
+          showNotification(
             receiverInfo?.displayName || "Someone",
             newMsg.content,
             newMsg.type
