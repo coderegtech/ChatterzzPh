@@ -15,7 +15,7 @@ import {
 import moment from "moment";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Loading from "../loading";
 
 const Messages = () => {
@@ -27,6 +27,30 @@ const Messages = () => {
   const { user, setUser } = useAuth();
   const toast = useToast();
   const senderId = user?.uid || "something";
+  const previousMessagesRef = useRef({});
+
+  const showNotification = (senderName, messageContent, messageType) => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      const body =
+        messageType === "image" ? "📷 Sent an image" : messageContent;
+
+      const notification = new Notification(`New message from ${senderName}`, {
+        body: body,
+        icon: "/placeholder-logo.png",
+        badge: "/placeholder-logo.png",
+        tag: "message-notification",
+        requireInteraction: false,
+      });
+
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+
+      // Auto close after 5 seconds
+      setTimeout(() => notification.close(), 5000);
+    }
+  };
 
   useEffect(() => {
     if (!senderId) return;
@@ -43,11 +67,55 @@ const Messages = () => {
 
     const unsubscribe = onSnapshot(
       q,
-      (snapshot) => {
+      async (snapshot) => {
         const inboxMessages = snapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
         }));
+
+        for (const message of inboxMessages) {
+          const previousMessage = previousMessagesRef.current[message.id];
+
+          if (
+            previousMessage &&
+            previousMessage.lastMessage !== message.lastMessage
+          ) {
+            if (message.lastSenderId && message.lastSenderId !== senderId) {
+              const nagSendId = message.participants.find(
+                (p) => p !== senderId
+              );
+
+              try {
+                const senderName = await new Promise((resolve, reject) => {
+                  fetchUserById(nagSendId, (data) => {
+                    if (data) {
+                      resolve(data);
+                    } else {
+                      reject(new Error("Failed to fetch user"));
+                    }
+                  });
+                });
+
+                showNotification(
+                  senderName?.displayName || "Someone",
+                  message.lastMessage
+                );
+              } catch (error) {
+                console.error("Failed to fetch user for notification:", error);
+                showNotification("Someone", message.lastMessage);
+              }
+            }
+          }
+        }
+
+        const messagesMap = {};
+        inboxMessages.forEach((msg) => {
+          messagesMap[msg.id] = {
+            lastMessage: msg.lastMessage,
+            lastSenderId: msg.lastSenderId,
+          };
+        });
+        previousMessagesRef.current = messagesMap;
 
         const receivers = inboxMessages.map((item) =>
           item.participants.find((id) => id !== senderId)
@@ -106,8 +174,8 @@ const Messages = () => {
     try {
       await logoutUser();
       setUser(null);
-      router.push("/login");
       localStorage.removeItem("user");
+      router.push("/login");
 
       toast("success", "User logged out!");
     } catch (error) {
