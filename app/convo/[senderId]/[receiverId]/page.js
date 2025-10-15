@@ -359,7 +359,7 @@ const Conversation = () => {
                   } ${msg.type === "image" ? "p-1" : "px-4 py-2"}`}
                 >
                   {msg.type === "image" ? (
-                    <div className="relative w-full h-48">
+                    <div className="relative max-w-48 w-36 h-48">
                       <Image
                         src={msg.content || "/placeholder.svg"}
                         alt="Shared image"
@@ -408,7 +408,7 @@ const Conversation = () => {
       <div className="fixed bottom-0 left-0 w-full p-4 bg-black bg-opacity-30 backdrop-blur-lg border-t border-indigo-900/30 z-50">
         <form
           onSubmit={handleSend}
-          className="flex items-center bg-black bg-opacity-40 backdrop-blur-sm rounded-full px-4 py-2 border border-indigo-900/30"
+          className="flex items-center bg-black bg-opacity-40 backdrop-blur-sm rounded-xl px-4 py-2 border border-indigo-900/30"
         >
           <input
             type="file"
@@ -416,6 +416,14 @@ const Conversation = () => {
             accept="image/*"
             onChange={handleImageUpload}
             className="hidden"
+          />
+
+          <input
+            type="text"
+            value={newMessage}
+            onChange={handleOnChange}
+            placeholder="Type a message"
+            className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-white placeholder-gray-400"
           />
 
           <button
@@ -428,8 +436,8 @@ const Conversation = () => {
               <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
             ) : (
               <svg
-                width="20px"
-                height="20px"
+                width="25px"
+                height="25px"
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -455,19 +463,11 @@ const Conversation = () => {
               </svg>
             )}
           </button>
-
-          <input
-            type="text"
-            value={newMessage}
-            onChange={handleOnChange}
-            placeholder="Type a message"
-            className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-white placeholder-gray-400"
-          />
           <button
             type="submit"
             onClick={handleSend}
             disabled={!newMessage.trim()}
-            className={`p-2 rounded-full rotate-90 ${
+            className={`p-2 rounded-lg rotate-90 ${
               newMessage.trim()
                 ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-blue-500/20"
                 : "bg-gray-700 text-gray-500"
