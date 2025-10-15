@@ -44,6 +44,20 @@ export const uploadProfile = async (file, uid) => {
   }
 };
 
+export const toggleUserStatus = async (uid, status) => {
+  try {
+    console.log("status: ", status);
+
+    const userRef = doc(db, "users", uid);
+    await updateDoc(userRef, {
+      status: status,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 export const createUser = async (formdata) => {
   try {
     // signup firebase auth
@@ -122,16 +136,16 @@ export const loginUser = async (email, password) => {
     const userRef = collection(db, "users", uid);
     await getDoc(userRef, (snapshot) => {
       if (snapshot) {
+        // change the status of the user to online
+        toggleUserStatus(uid, "online");
+        console.log("User logged in: ", user);
+
         console.log("snapshots: ", snapshot);
         return {
           data: snapshot.data(),
         };
       }
     });
-
-    // change the status of the user to online
-    await toggleUserStatus(uid, "online");
-    console.log("User logged in: ", user);
 
     return {
       data: user,
@@ -140,15 +154,6 @@ export const loginUser = async (email, password) => {
     return {
       error: e,
     };
-  }
-};
-
-export const toggleUserStatus = async (uid, status) => {
-  try {
-    const userRef = doc(db, "users", uid);
-    await updateDoc(userRef, { status: status, updatedAt: serverTimestamp() });
-  } catch (e) {
-    console.log(e);
   }
 };
 

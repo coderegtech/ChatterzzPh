@@ -1,6 +1,5 @@
 import { ToastProvider } from "@/components/Toastify";
 import UserProvider from "@/context/userContext";
-import Script from "next/script";
 import "./globals.css";
 
 export const metadata = {
@@ -52,11 +51,6 @@ export default function RootLayout({ children }) {
         />
 
         <link rel="manifest" href="/manifest.json" />
-
-        <Script
-          src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"
-          defer
-        />
       </head>
       <body>
         <UserProvider>

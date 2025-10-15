@@ -43,13 +43,6 @@ const Conversation = () => {
 
   const router = useRouter();
 
-  const handleOnChange = async (e) => {
-    const value = e.target.value;
-    setNewMessage(value);
-
-    await updateTypingStatus(value !== "");
-  };
-
   const scrollToBottom = () => {
     if (scrollRef?.current) {
       scrollRef.current?.scrollTo({
@@ -61,6 +54,14 @@ const Conversation = () => {
       updateSeenStatus();
       setIsSeen(true);
     }
+  };
+
+  const handleOnChange = async (e) => {
+    const value = e.target.value;
+    setNewMessage(value);
+
+    scrollToBottom();
+    await updateTypingStatus(value !== "");
   };
 
   const showNotification = (senderName, messageContent, messageType) => {
