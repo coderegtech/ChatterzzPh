@@ -8,6 +8,7 @@ import moment from "moment";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { FullScreenImage } from "../convo/[senderId]/[receiverId]/page";
 import { Avatar } from "../messages/page";
 
 const GroupChats = () => {
@@ -21,6 +22,11 @@ const GroupChats = () => {
   const senderId = auth.currentUser?.uid;
   const [uploading, setUploading] = useState(false);
   const previousMessageCount = useRef(0);
+
+  const [isFullScreen, setFullscreen] = useState({
+    isFull: false,
+    image: null,
+  });
 
   const handleOnChange = async (e) => {
     const value = e.target.value;
@@ -170,7 +176,7 @@ const GroupChats = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black">
+    <div className="relative flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black">
       <div className="bg-black bg-opacity-40 backdrop-blur-lg p-4 flex items-center border-b border-indigo-900/30">
         <div className="flex items-center space-x-3">
           <div onClick={() => router.back()} className="cursor-pointer">
@@ -248,7 +254,12 @@ const GroupChats = () => {
                   }`}
                 >
                   {msg.messageType === "image" ? (
-                    <div className="relative max-w-56 w-36 h-40 p-0">
+                    <div
+                      onClick={() =>
+                        setFullscreen({ isFull: true, image: msg.message })
+                      }
+                      className="relative max-w-56 w-36 h-40 p-0"
+                    >
                       <Image
                         src={msg.message || "/placeholder.svg"}
                         alt={msg.message}
@@ -362,6 +373,13 @@ const GroupChats = () => {
           </div>
         </form>
       </div>
+
+      {isFullScreen?.isFull && (
+        <FullScreenImage
+          image={isFullScreen.image}
+          close={() => setFullscreen({ isFull: false, image: null })}
+        />
+      )}
     </div>
   );
 };

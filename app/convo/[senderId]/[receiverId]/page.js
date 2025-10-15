@@ -1,6 +1,6 @@
 "use client";
 import { Avatar } from "@/app/messages/page";
-import { MenuDotsIcon } from "@/components/Icons";
+import { CloseIcon, MenuDotsIcon } from "@/components/Icons";
 import { SideMenu } from "@/components/SideMenu";
 import { db } from "@/config/firebase";
 import { fetchUserById } from "@/config/hooks";
@@ -35,6 +35,11 @@ const Conversation = () => {
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const previousMessageCount = useRef(0);
+
+  const [isFullScreen, setFullscreen] = useState({
+    isFull: false,
+    image: null,
+  });
 
   const router = useRouter();
 
@@ -320,7 +325,7 @@ const Conversation = () => {
   }, [receiverId]);
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black ">
+    <div className="relative flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black ">
       {/* Header */}
       <div className="bg-black bg-opacity-40 backdrop-blur-lg p-4 flex items-center border-b border-indigo-900/30">
         <div className="flex items-center space-x-3">
@@ -400,7 +405,12 @@ const Conversation = () => {
                   }`}
                 >
                   {msg.type === "image" ? (
-                    <div className="relative max-w-56 w-36 h-40 p-0">
+                    <div
+                      onClick={() =>
+                        setFullscreen({ isFull: true, image: msg.content })
+                      }
+                      className="relative max-w-56 w-36 h-40 p-0"
+                    >
                       <Image
                         src={msg.content || "/placeholder.svg"}
                         alt={msg.content}
@@ -540,6 +550,36 @@ const Conversation = () => {
           convoId={conversationId}
         />
       )}
+
+      {isFullScreen?.isFull && (
+        <FullScreenImage
+          image={isFullScreen.image}
+          close={() => setFullscreen({ isFull: false, image: null })}
+        />
+      )}
+    </div>
+  );
+};
+
+export const FullScreenImage = ({ image, close }) => {
+  return (
+    <div className="absolute inset-0 p-4  bg-black">
+      <div
+        onClick={close}
+        className="absolute right-4 top-4 bg-neutral-500/30 z-50"
+      >
+        <CloseIcon size={"30"} />
+      </div>
+
+      <div className=" p-4">
+        <Image
+          src={image || "/placeholder.svg"}
+          alt={image}
+          fill
+          priority
+          className="object-contain rounded-xl overflow-hidden"
+        />
+      </div>
     </div>
   );
 };
