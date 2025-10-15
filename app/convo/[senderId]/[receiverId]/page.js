@@ -15,6 +15,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import moment from "moment";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -30,6 +31,8 @@ const Conversation = () => {
   const [msgId, setMsgId] = useState(null);
   const [receiverInfo, setReceiverInfo] = useState(null);
   const [activeSideMenu, setActiveSideMenu] = useState(false);
+  const fileInputRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
 
   const router = useRouter();
 
@@ -40,7 +43,6 @@ const Conversation = () => {
     await updateTypingStatus(value !== "");
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const scrollToBottom = () => {
     if (scrollRef?.current) {
       scrollRef.current?.scrollTo({
@@ -78,7 +80,7 @@ const Conversation = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [messages]);
 
   useEffect(() => {
     const typingRef = collection(db, `chats/${conversationId}/typing`);
@@ -101,7 +103,7 @@ const Conversation = () => {
   useEffect(() => {
     const seenRef = collection(db, `chats/${conversationId}/seen`);
     const unsubscribe = onSnapshot(seenRef, (snapshot) => {
-      let seenStatus = {};
+      const seenStatus = {};
       snapshot.docs.forEach((doc) => {
         seenStatus[doc.id] = doc.data().seen;
       });
@@ -146,6 +148,7 @@ const Conversation = () => {
         senderId,
         receiverId,
         content: newMessage,
+        type: "text",
         datetime: moment().format("YYYY-MM-DD HH:mm:ss"),
         seen: false,
         timestamp: serverTimestamp(),
@@ -178,6 +181,89 @@ const Conversation = () => {
       setNewMessage("");
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file.");
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size should be less than 5MB.");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      // Upload to server
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Send image message
+        await sendImageMessage(data.imageUrl);
+      } else {
+        alert(data.error || "Failed to upload image");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload image");
+    } finally {
+      setUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const sendImageMessage = async (imageUrl) => {
+    try {
+      const messageData = {
+        senderId,
+        receiverId,
+        content: imageUrl,
+        type: "image",
+        datetime: moment().format("YYYY-MM-DD HH:mm:ss"),
+        seen: false,
+        timestamp: serverTimestamp(),
+      };
+
+      const messagesRef = collection(db, `chats/${conversationId}/messages`);
+      const messageDoc = await addDoc(messagesRef, messageData);
+      const lastMessageId = messageDoc.id;
+
+      const conversationRef = doc(db, "chats", conversationId);
+      const inboxData = {
+        participants: [senderId, receiverId],
+        lastMessage: "📷 Image",
+        lastMessageId: lastMessageId,
+        lastSenderId: senderId,
+        status: "active",
+        session: 86400,
+        datetime: moment().format("YYYY-MM-DD HH:mm:ss"),
+        timestamp: serverTimestamp(),
+      };
+
+      await setDoc(conversationRef, inboxData, { merge: true });
+      scrollToBottom();
+    } catch (error) {
+      console.error("Error sending image:", error);
     }
   };
 
@@ -270,9 +356,20 @@ const Conversation = () => {
                     isMe
                       ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl rounded-tr-none shadow-lg shadow-blue-500/20"
                       : "bg-black bg-opacity-40 backdrop-blur-sm text-white border border-indigo-900/30 rounded-xl rounded-tl-none"
-                  } px-4 py-2`}
+                  } ${msg.type === "image" ? "p-1" : "px-4 py-2"}`}
                 >
-                  <p className="text-sm">{msg.content}</p>
+                  {msg.type === "image" ? (
+                    <div className="relative w-full h-48">
+                      <Image
+                        src={msg.content || "/placeholder.svg"}
+                        alt="Shared image"
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-sm">{msg.content}</p>
+                  )}
                 </div>
 
                 <div
@@ -313,6 +410,52 @@ const Conversation = () => {
           onSubmit={handleSend}
           className="flex items-center bg-black bg-opacity-40 backdrop-blur-sm rounded-full px-4 py-2 border border-indigo-900/30"
         >
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="p-2 mr-2 hover:bg-white/10 rounded-full transition-colors"
+          >
+            {uploading ? (
+              <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <svg
+                width="20px"
+                height="20px"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 12.5001L3.75159 10.9675C4.66286 10.1702 6.03628 10.2159 6.89249 11.0721L11.1822 15.3618C11.8694 16.0491 12.9512 16.1428 13.7464 15.5839L14.0446 15.3744C15.1888 14.5702 16.7369 14.6634 17.7765 15.599L21 18.5001"
+                  stroke="#06b6d4"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M15 5.5H18.5M18.5 5.5H22M18.5 5.5V9M18.5 5.5V2"
+                  stroke="#06b6d4"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 10.8717 2 9.87835 2.02008 9M12 2C7.28595 2 4.92893 2 3.46447 3.46447C3.03965 3.88929 2.73806 4.38921 2.52396 5"
+                  stroke="#06b6d4"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            )}
+          </button>
+
           <input
             type="text"
             value={newMessage}
@@ -447,4 +590,5 @@ const MenuDotsIcon = ({ size }) => {
     </svg>
   );
 };
+
 export default Conversation;

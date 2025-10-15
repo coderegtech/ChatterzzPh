@@ -353,7 +353,13 @@ export const AnonymousSignin = async () => {
   }
 };
 
-export const createGlobalChat = async (uid, senderName, photoUrl, msg) => {
+export const createGlobalChat = async (
+  uid,
+  senderName,
+  photoUrl,
+  msgType,
+  msg
+) => {
   try {
     const chatRef = collection(db, "globalChats");
     const data = {
@@ -362,6 +368,7 @@ export const createGlobalChat = async (uid, senderName, photoUrl, msg) => {
       senderName: senderName,
       senderPhoto: photoUrl,
       message: msg,
+      messageType: msgType,
       createdAt: moment().format("YYYY-MM-DD HH:mm:ss"),
       timestamp: serverTimestamp(),
     };

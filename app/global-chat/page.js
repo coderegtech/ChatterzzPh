@@ -5,6 +5,7 @@ import { createGlobalChat, fetchUserById } from "@/config/hooks";
 import { useAuth } from "@/context/userContext";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import moment from "moment";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "../messages/page";
@@ -15,8 +16,10 @@ const GroupChats = () => {
   const [newMessage, setNewMessage] = useState("");
   const router = useRouter();
   const scrollRef = useRef(null);
+  const fileInputRef = useRef(null);
   const { user } = useAuth();
   const senderId = auth.currentUser?.uid;
+  const [uploading, setUploading] = useState(false);
 
   const handleOnChange = async (e) => {
     const value = e.target.value;
@@ -63,6 +66,7 @@ const GroupChats = () => {
           senderId,
           data?.displayName,
           data?.photoURL,
+          "text",
           newMessage
         );
         console.log(res);
@@ -74,9 +78,60 @@ const GroupChats = () => {
     }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size should be less than 5MB.");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        await fetchUserById(senderId, async (userData) => {
+          const res = await createGlobalChat(
+            senderId,
+            userData?.displayName,
+            userData?.photoURL,
+            "image",
+            data.imageUrl
+          );
+          console.log(res);
+        });
+      } else {
+        alert(data.error || "Failed to upload image");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload image");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black">
-      {/* Header */}
       <div className="bg-black bg-opacity-40 backdrop-blur-lg p-4 flex items-center border-b border-indigo-900/30">
         <div className="flex items-center space-x-3">
           <div onClick={() => router.back()} className="cursor-pointer">
@@ -110,7 +165,6 @@ const GroupChats = () => {
         </div>
       </div>
 
-      {/* Messages */}
       <div
         ref={scrollRef}
         id="scroll-smooth"
@@ -148,9 +202,20 @@ const GroupChats = () => {
                     isMe
                       ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl rounded-tr-none shadow-lg shadow-blue-500/20"
                       : "bg-black bg-opacity-40 backdrop-blur-sm text-white border border-indigo-900/30 rounded-xl rounded-tl-none"
-                  } px-4 py-2`}
+                  } ${msg.msgType === "image" ? "p-1" : "px-4 py-2"}`}
                 >
-                  <p className="text-sm">{msg.message}</p>
+                  {msg.msgType === "image" ? (
+                    <div className="relative w-full h-48">
+                      <Image
+                        src={msg.message || "/placeholder.svg"}
+                        alt="Shared image"
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-sm">{msg.message}</p>
+                  )}
                 </div>
 
                 <span
@@ -174,38 +239,83 @@ const GroupChats = () => {
         })}
       </div>
 
-      {/* Message Input */}
       <div className="fixed bottom-0 left-0 w-full p-4 bg-black bg-opacity-30 backdrop-blur-lg border-t border-indigo-900/30">
-        <form
-          onSubmit={handleSend}
-          className="flex items-center bg-black bg-opacity-40 backdrop-blur-sm rounded-full px-4 py-2 border border-indigo-900/30"
-        >
+        <form className="flex items-center bg-black bg-opacity-40 backdrop-blur-sm rounded-xl px-4 py-2 border border-indigo-900/30">
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+
           <input
             type="text"
             value={newMessage}
             onChange={handleOnChange}
             placeholder="Type a message"
-            className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-white placeholder-gray-400"
+            className="flex-1 h-full bg-transparent border-none focus:ring-0 focus:outline-none text-white placeholder-gray-400"
           />
-          <button
-            type="submit"
-            onClick={handleSend}
-            disabled={!newMessage.trim()}
-            className={`p-2 rounded-full rotate-90 ${
-              newMessage.trim()
-                ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-blue-500/20"
-                : "bg-gray-700 text-gray-500"
-            } transition-all duration-300`}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+
+          <div className="flex gap-x-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
             >
-              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-            </svg>
-          </button>
+              {uploading ? (
+                <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <svg
+                  width="30px"
+                  height="30px"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M2 12.5001L3.75159 10.9675C4.66286 10.1702 6.03628 10.2159 6.89249 11.0721L11.1822 15.3618C11.8694 16.0491 12.9512 16.1428 13.7464 15.5839L14.0446 15.3744C15.1888 14.5702 16.7369 14.6634 17.7765 15.599L21 18.5001"
+                    stroke="#fff"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M15 5.5H18.5M18.5 5.5H22M18.5 5.5V9M18.5 5.5V2"
+                    stroke="#fff"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 10.8717 2 9.87835 2.02008 9M12 2C7.28595 2 4.92893 2 3.46447 3.46447C3.03965 3.88929 2.73806 4.38921 2.52396 5"
+                    stroke="#fff"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              )}
+            </button>
+
+            <button
+              type="submit"
+              onClick={handleSend}
+              disabled={!newMessage.trim()}
+              className={`p-2 rounded-lg rotate-90 ${
+                newMessage.trim()
+                  ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-blue-500/20"
+                  : "bg-gray-700 text-gray-500"
+              } transition-all duration-300`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+              </svg>
+            </button>
+          </div>
         </form>
       </div>
     </div>
