@@ -1,4 +1,5 @@
 import { put } from "@vercel/blob";
+import axios from "axios";
 import { NextResponse } from "next/server";
 
 const BASE_URL =
@@ -39,6 +40,17 @@ export async function POST(request) {
     const blob = await put(filename, file, {
       access: "public",
     });
+
+    // upload to fruitask
+    const res = await axios.post(BASE_URL, {
+      Name: originalName,
+      Image: blob.url,
+      Timestamp: timestamp,
+    });
+
+    if (res.status) {
+      console.log("Image uploaded successfully");
+    }
 
     // Return public URL from Vercel Blob
     return NextResponse.json(

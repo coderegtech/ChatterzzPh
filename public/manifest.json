@@ -10,16 +10,10 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/window.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/placeholder-logo.png",
+      "src": "/placeholder.svg",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/svg",
+      "purpose": "any maskable"
     }
   ]
 }

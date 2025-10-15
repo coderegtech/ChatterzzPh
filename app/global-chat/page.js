@@ -20,6 +20,7 @@ const GroupChats = () => {
   const { user } = useAuth();
   const senderId = auth.currentUser?.uid;
   const [uploading, setUploading] = useState(false);
+  const previousMessageCount = useRef(0);
 
   const handleOnChange = async (e) => {
     const value = e.target.value;
@@ -35,21 +36,59 @@ const GroupChats = () => {
     }
   };
 
+  const sendGlobalNotification = async (
+    senderName,
+    messageContent,
+    messageType
+  ) => {
+    try {
+      await fetch("/api/send-notification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          senderName,
+          messageContent,
+          messageType,
+          notificationType: "global",
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to send notification:", error);
+    }
+  };
+
   useEffect(() => {
     const chatRef = collection(db, `globalChats`);
     const q = query(chatRef, orderBy("timestamp", "asc"));
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
       const chats = snapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
       }));
 
+      if (
+        previousMessageCount.current > 0 &&
+        chats.length > previousMessageCount.current
+      ) {
+        const newMsg = chats[chats.length - 1];
+        if (newMsg.senderId !== senderId) {
+          await sendGlobalNotification(
+            newMsg.senderName || "Someone",
+            newMsg.message,
+            newMsg.msgType
+          );
+        }
+      }
+      previousMessageCount.current = chats.length;
+
       setGroupChats(chats);
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, senderId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -202,15 +241,20 @@ const GroupChats = () => {
                     isMe
                       ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl rounded-tr-none shadow-lg shadow-blue-500/20"
                       : "bg-black bg-opacity-40 backdrop-blur-sm text-white border border-indigo-900/30 rounded-xl rounded-tl-none"
-                  } ${msg.messageType === "image" ? "p-1" : "px-4 py-2"}`}
+                  } ${
+                    msg.messageType === "image"
+                      ? "bg-none shadow-none backdrop-blur-none border-none p-0"
+                      : "px-4 py-2"
+                  }`}
                 >
                   {msg.messageType === "image" ? (
-                    <div className="relative max-w-48 w-36 h-48">
+                    <div className="relative max-w-56 w-36 h-40 p-0">
                       <Image
                         src={msg.message || "/placeholder.svg"}
-                        alt="Shared image"
+                        alt={msg.message}
                         fill
-                        className="object-cover rounded-lg"
+                        priority
+                        className="object-contain rounded-xl overflow-hidden"
                       />
                     </div>
                   ) : (

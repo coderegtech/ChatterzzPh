@@ -1,4 +1,5 @@
 "use client";
+import OneSignalInit from "@/components/OneSignalInit";
 import { useToast } from "@/components/Toastify";
 import { auth, db } from "@/config/firebase";
 import { fetchUserById, logoutUser } from "@/config/hooks";
@@ -106,6 +107,7 @@ const Messages = () => {
       await logoutUser();
       setUser(null);
       router.push("/login");
+      localStorage.removeItem("user");
 
       toast("success", "User logged out!");
     } catch (error) {
@@ -117,6 +119,8 @@ const Messages = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-indigo-900 to-black relative">
+      <OneSignalInit userId={user?.uid} />
+
       <Header router={router} />
       <UserInfoBar user={user} auth={auth} signOut={handleLogout} />
       <GlobalChatIndex />

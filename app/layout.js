@@ -1,5 +1,6 @@
 import { ToastProvider } from "@/components/Toastify";
 import UserProvider from "@/context/userContext";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata = {
@@ -11,11 +12,20 @@ export const metadata = {
   authors: [{ name: "ChatterzzPh Team" }],
   creator: "Coderegtech",
   publisher: "Coderegtech",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#3b82f6" />
+        <link rel="manifest" href="/manifest.json" />
+        <Script
+          src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+          defer
+        />
+      </head>
       <body>
         <UserProvider>
           <ToastProvider>{children}</ToastProvider>
