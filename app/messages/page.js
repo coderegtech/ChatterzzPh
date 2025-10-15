@@ -73,40 +73,26 @@ const Messages = () => {
           id: doc.id,
         }));
 
-        for (const message of inboxMessages) {
+        inboxMessages.forEach((message) => {
           const previousMessage = previousMessagesRef.current[message.id];
 
           if (
             previousMessage &&
-            previousMessage.lastMessage !== message.lastMessage
+            previousMessage.lastMessage !== message.lastMessage &&
+            message.lastSenderId &&
+            message.lastSenderId !== senderId
           ) {
-            if (message.lastSenderId && message.lastSenderId !== senderId) {
-              const nagSendId = message.participants.find(
-                (p) => p !== senderId
-              );
+            const nagSendId = message.participants.find((p) => p !== senderId);
 
-              try {
-                const senderName = await new Promise((resolve, reject) => {
-                  fetchUserById(nagSendId, (data) => {
-                    if (data) {
-                      resolve(data);
-                    } else {
-                      reject(new Error("Failed to fetch user"));
-                    }
-                  });
-                });
-
-                showNotification(
-                  senderName?.displayName || "Someone",
-                  message.lastMessage
-                );
-              } catch (error) {
-                console.error("Failed to fetch user for notification:", error);
-                showNotification("Someone", message.lastMessage);
+            fetchUserById(nagSendId, (senderName) => {
+              if (senderName?.displayName) {
+                showNotification(senderName?.displayName, message.lastMessage);
               }
-            }
+
+              showNotification("Someone", "New Message");
+            });
           }
-        }
+        });
 
         const messagesMap = {};
         inboxMessages.forEach((msg) => {
