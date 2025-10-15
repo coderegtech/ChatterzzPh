@@ -1,9 +1,8 @@
+import { put } from "@vercel/blob";
+import { NextResponse } from "next/server";
+
 const BASE_URL =
   "https://api.fruitask.com/v3/tables/iSYIu8SoyJrUlfu/rows/?api_key=55b4b1b8c8d48bcb874b2db55501fe44";
-
-import { mkdir, writeFile } from "fs/promises";
-import { NextResponse } from "next/server";
-import path from "path";
 
 export async function POST(request) {
   try {
@@ -33,33 +32,19 @@ export async function POST(request) {
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Create unique filename
     const timestamp = Date.now();
     const originalName = file.name.replace(/\s+/g, "-");
     const filename = `${timestamp}-${originalName}`;
 
-    // Ensure uploads directory exists
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    try {
-      await mkdir(uploadsDir, { recursive: true });
-    } catch (error) {
-      // Directory might already exist
-    }
+    const blob = await put(filename, file, {
+      access: "public",
+    });
 
-    // Save file
-    const filepath = path.join(uploadsDir, filename);
-    await writeFile(filepath, buffer);
-
-    // Return public URL
-    const imageUrl = `/uploads/${filename}`;
-
+    // Return public URL from Vercel Blob
     return NextResponse.json(
       {
         success: true,
-        imageUrl: imageUrl,
+        imageUrl: blob.url,
         message: "Image uploaded successfully",
       },
       { status: 201 }

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/blob": "^2.0.0",
     "axios": "^1.7.9",
     "firebase": "^11.2.0",
     "framer-motion": "^12.10.5",
